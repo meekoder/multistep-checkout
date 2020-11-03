@@ -7,22 +7,6 @@ var Redirect = window.ReactRouterDOM.Redirect;
 var browserHistory = window.ReactRouter.browserHistory;
 
 class App extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      response: ''
-    };
-  }
-
-  callAPI() {
-    fetch("http://localhost:3000/")
-      .then(res => res.text())
-      .then(res => this.setState({response: res}));
-  }
-
-  componentWillMount() {
-    this.callAPI();
-  }
 
   render() {
     return (
@@ -30,13 +14,12 @@ class App extends React.Component {
         <div>
           <ul>
             <li>
-              <Link to="/home">Home</Link>
+              <Link to="/">Home</Link>
             </li>
           </ul>
           <hr />
-          <p>{this.state.response}</p>
         <Switch>
-          <Route exact path='/home'>
+          <Route exact path='/'>
             <Home />
           </Route>
           <Route path='/account'>
@@ -147,7 +130,7 @@ class Confirmation extends React.Component {
     return (
       <div> 
         <h1>Order Confirmation</h1>
-        <Link to="/home">
+        <Link to="/">
           <button>Place Order</button>
         </Link>
       </div>
