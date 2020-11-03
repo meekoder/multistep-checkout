@@ -93,8 +93,7 @@ class Account extends React.Component {
     const payload = {name, email, password};
 
     apis.createAccount(payload)
-      .then((r) => r.json())
-      .then((r) => console.log(r.message))
+      .then((r) => console.log(r.data.message))
       .then(() => this.props.history.push('/shipping'));
   }
 
