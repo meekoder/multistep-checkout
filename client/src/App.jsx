@@ -6,6 +6,14 @@ var Switch = window.ReactRouterDOM.Switch;
 var Redirect = window.ReactRouterDOM.Redirect;
 var browserHistory = window.ReactRouter.browserHistory;
 
+var api = axios.create({
+    baseURL: 'http://localhost:3000/api',
+})
+
+const createAccount = payload => api.post(`/account`, payload)
+
+const apis = {createAccount}
+
 class App extends React.Component {
 
   render() {
@@ -19,21 +27,11 @@ class App extends React.Component {
           </ul>
           <hr />
         <Switch>
-          <Route exact path='/'>
-            <Home />
-          </Route>
-          <Route path='/account'>
-            <Account />
-          </Route>
-          <Route path='/shipping'>
-            <Shipping />
-          </Route>
-          <Route path='/billing'>
-            <Billing />
-          </Route>
-          <Route path='/confirmation'>
-            <Confirmation />
-          </Route>
+          <Route exact path='/' component={Home} />
+          <Route path='/account' component={Account} />
+          <Route path='/shipping' component={Shipping} />
+          <Route path='/billing' component={Billing} />
+          <Route path='/confirmation' component={Confirmation} />
         </Switch>
       </div>
       </Router>
@@ -43,7 +41,7 @@ class App extends React.Component {
 
 class Home extends React.Component {
   constructor(props) {
-    super(props);
+    super(props)
   }
 
   render() {
@@ -60,19 +58,55 @@ class Home extends React.Component {
 
 class Account extends React.Component {
   constructor(props) {
-    super(props);
+    super(props)
+    this.state = {
+      name: '',
+      email: '',
+      password: ''
+    }
+    this.handleNameChange = this.handleNameChange.bind(this)
+    this.handleEmailChange = this.handleEmailChange.bind(this)
+    this.handlePasswordChange = this.handlePasswordChange.bind(this)
+    this.handleAccountCreation = this.handleAccountCreation.bind(this)
+  }
+  
+  handleNameChange(e) {
+    const name = e.target.value
+    this.setState({name})
+  }
+
+  handleEmailChange(e) {
+    const email = e.target.value
+    this.setState({email})
+  }
+
+  handlePasswordChange(e) {
+    const password = e.target.value
+    this.setState({password})
+  }
+
+  handleAccountCreation() {
+    const { name, email, password } = this.state
+    const payload = {name, email, password}
+
+    apis.createAccount(payload)
+      .then((r) => r.json())
+      .then((r) => console.log(r.message))
+      .then(() => this.props.history.push('/shipping'))
   }
 
   render() {
+    const {name, email, password} = this.state
     return (
       <div> 
         <h1>Make an account!</h1>
-        <input type='text' placeholder='Name'></input>
-        <input type='email' placeholder='Email'></input>
-        <input type='password' placeholder='Password'></input>
-        <Link to="/shipping">
-          <button>Next</button>
-        </Link>
+        <label>Name</label>
+        <input type='text' placeholder='Name' value={name} onChange={this.handleNameChange}></input>
+        <label>Email</label>
+        <input type='email' placeholder='Email' value={email} onChange={this.handleEmailChange}></input>
+        <label>Password</label>
+        <input type='password' placeholder='Password' value={password} onChange={this.handlePasswordChange}></input>
+        <button type='submit' onClick={this.handleAccountCreation}>Next</button>
       </div>
     )
   }
@@ -87,7 +121,7 @@ class Shipping extends React.Component {
     return (
       <div> 
         <h1>Shipping Information</h1>
-        <input type='text' placeholder='Street 1'></input>
+        <input type='text' placeholder='Street'></input>
         <input type='text' placeholder='Apt/Unit #'></input>
         <input type='text' placeholder='City'></input>
         <input type='text' placeholder='State'></input>
