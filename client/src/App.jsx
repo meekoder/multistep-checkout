@@ -12,8 +12,9 @@ var api = axios.create({
 
 const createAccount = payload => api.post(`/account`, payload);
 const addShipping = payload => api.post(`/shipping`, payload);
+const addBilling = payload => api.post(`/billing`, payload);
 
-const apis = {createAccount, addShipping};
+const apis = {createAccount, addShipping, addBilling};
 
 class App extends React.Component {
   render() {
@@ -128,6 +129,8 @@ class Shipping extends React.Component {
     this.handleStreet2Change = this.handleStreet2Change.bind(this);
     this.handleCityChange = this.handleCityChange.bind(this);
     this.handleStateChange = this.handleStateChange.bind(this);
+    this.handleZipcodeChange = this.handleZipcodeChange.bind(this);
+    this.handleShipping = this.handleShipping.bind(this);
   }
 
   handleStreet1Change(e) {
@@ -160,20 +163,20 @@ class Shipping extends React.Component {
     const payload = {street1, street2, city, zipcode};
 
     apis.addShipping(payload)
-      .then((r) => r.json())
-      .then((r) => console.log(r.message))
+      .then((r) => console.log(r.data.message))
       .then(() => this.props.history.push('/billing'));
   }
   
   render() {
+    const {street1, street2, city, state, zipcode} = this.state;
     return (
       <div> 
         <h1>Shipping Information</h1>
-        <input type='text' placeholder='Street' onChange={this.handleStreet1Change}></input>
-        <input type='text' placeholder='Apt/Unit #' onChange={this.handleStreet2Change}></input>
-        <input type='text' placeholder='City' onChange={this.handleCityChange}></input>
-        <input type='text' placeholder='State' onChange={this.handleStateChange}></input>
-        <input type='text' placeholder='Zip Code' onChange={this.handleZipcodeChange}></input>
+        <input type='text' placeholder='Street' value={street1} onChange={this.handleStreet1Change}></input>
+        <input type='text' placeholder='Apt/Unit #' value={street2} onChange={this.handleStreet2Change}></input>
+        <input type='text' placeholder='City' value={city} onChange={this.handleCityChange}></input>
+        <input type='text' placeholder='State' value={state} onChange={this.handleStateChange}></input>
+        <input type='text' placeholder='Zip Code' value={zipcode} onChange={this.handleZipcodeChange}></input>
         <Link to="/billing">
           <button onClick={this.handleShipping}>Next</button>
         </Link>
@@ -185,19 +188,58 @@ class Shipping extends React.Component {
 class Billing extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      cardNumber: '',
+      expirationDate: '',
+      cvv: '',
+      zipcode: ''
+    };
+    this.handleCardChange = this.handleCardChange.bind(this);
+    this.handleExpirationChange = this.handleExpirationChange.bind(this);
+    this.handleCVVChange = this.handleCVVChange.bind(this);
+    this.handleZipcodeChange = this.handleZipcodeChange.bind(this);
+    this.handleBilling = this.handleBilling.bind(this);
+  }
+
+  handleCardChange(e) {
+    const cardNumber = e.target.value;
+    this.setState({cardNumber});
+  }
+
+  handleExpirationChange(e) {
+    const expirationDate = e.target.value;
+    this.setState({expirationDate});
+  }
+
+  handleCVVChange(e) {
+    const cvv = e.target.value;
+    this.setState({cvv});
+  }
+
+  handleZipcodeChange(e) {
+    const zipcode = e.target.value;
+    this.setState({zipcode});
+  }
+
+  handleBilling() {
+    const {cardNumber, expirationDate, cvv, billingZipcode} = this.state;
+    const payload = {cardNumber, expirationDate, cvv, zipcode};
+
+    apis.addBilling(payload)
+      .then((r) => console.log(r.data.message))
+      .then(() => this.props.history.push('/confirmation'));
   }
   
   render() {
+    const {cardNumber, expirationDate, cvv, zipcode} = this.state;
     return (
       <div> 
         <h1>Billing Information</h1>
-        <input type='text' placeholder='Card Number'></input>
-        <input type='text' placeholder='Expiration Date'></input>
-        <input type='password' placeholder='CVV'></input>
-        <input type='text' placeholder='Zip Code'></input>
-        <Link to="/confirmation">
-          <button>Next</button>
-        </Link>
+        <input type='text' placeholder='Card Number' value={cardNumber} onChange={this.handleCardChange}></input>
+        <input type='text' placeholder='Expiration Date' value={expirationDate} onChange={this.handleExpirationChange}></input>
+        <input type='password' placeholder='CVV' value={cvv} onChange={this.handleCVVChange}></input>
+        <input type='text' placeholder='Zip Code' value={billingZipcode} onChange={this.handleZipcodeChange}></input>
+        <button onClick={this.handleBilling}>Next</button>
       </div>
     )
   }
